@@ -1,5 +1,5 @@
 TARGET := mini_unionfs
-SRCS := src/fuse_core.cpp src/read_ops.cpp src/write_ops.cpp src/deletion_ops.cpp src/path_resolution.cpp
+SRCS := src/fuse_core.cpp src/read_ops.cpp src/write_ops.cpp src/deletion_ops.cpp
 BUILD_DIR := build
 OBJS := $(SRCS:src/%.cpp=$(BUILD_DIR)/%.o)
 
