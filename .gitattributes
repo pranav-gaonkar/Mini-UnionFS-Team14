@@ -1,0 +1,2 @@
+* text=auto
+scripts/test_unionfs.sh text eol=lf

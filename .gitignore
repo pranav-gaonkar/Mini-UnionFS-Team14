@@ -1,0 +1,7 @@
+.venv/
+build/
+mini_unionfs
+unionfs_test_env/
+*.swp
+__pycache__/
+*.pyc
