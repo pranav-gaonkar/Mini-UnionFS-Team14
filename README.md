@@ -55,8 +55,8 @@ bash scripts/test_unionfs.sh
 ```
 The script builds a temporary environment, mounts the filesystem in foreground mode, exercises the three behaviors, and unmounts/cleans up automatically. If you see `mounting over filesystem type 0x01021997 is forbidden`, move the project to a native Linux path before rerunning.
 
-## Demo Workflow (Copy-Paste Commands)
-Use this exact sequence for a clean classroom demo on Windows + WSL2.
+## Demo Workflow 
+
 
 ### Terminal Setup
 - Open two terminals:
@@ -138,5 +138,5 @@ Optional cleanup:
 wsl -d Ubuntu rm -rf ~/unionfs_demo
 ```
 
-### One-Line Demo Summary (for presentation)
+### One-Line Demo Summary 
 "This demo shows UnionFS merged namespace behavior, copy-on-write promotion from lower to upper, and whiteout-based deletes (`.wh.<name>`), which are core layered filesystem semantics."
