@@ -22,7 +22,7 @@ A teaching implementation of a minimal Union File System using FUSE 3. It overla
 ## Build
 ```bash
 sudo apt update && sudo apt install -y build-essential pkg-config fuse3 libfuse3-dev
-git clone https://github.com/pranav-gaonkar/Mini-UnionFS.git
+git clone https://github.com/pranav-gaonkar/Mini-UnionFS-Team14.git
 cd Mini-UnionFS
 make
 ```
