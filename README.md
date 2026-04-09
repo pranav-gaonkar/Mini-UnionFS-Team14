@@ -68,19 +68,20 @@ The script builds a temporary environment, mounts the filesystem in foreground m
 Run in PowerShell:
 ```powershell
 cd D:\Mini-UnionFS-Team
+wsl -d Ubuntu make -C /mnt/d/Mini-UnionFS-Team clean
 wsl -d Ubuntu make -C /mnt/d/Mini-UnionFS-Team
 ```
 
 ### 2) Create a Fresh Demo Environment (native Linux path)
 Run in PowerShell:
 ```powershell
-wsl -d Ubuntu bash -lc 'rm -rf ~/unionfs_demo && mkdir -p ~/unionfs_demo/lower ~/unionfs_demo/upper ~/unionfs_demo/mnt && cp /etc/hosts ~/unionfs_demo/lower/base.txt'
+wsl -d Ubuntu bash -lc "fusermount3 -u ~/unionfs_demo/mnt 2>/dev/null || true; rm -rf ~/unionfs_demo; mkdir -p ~/unionfs_demo/lower ~/unionfs_demo/upper ~/unionfs_demo/mnt; cp /etc/hosts ~/unionfs_demo/lower/base.txt"
 ```
 
 ### 3) Start UnionFS (Terminal A)
 Run in **Terminal A** and keep it running:
 ```powershell
-wsl -d Ubuntu -e bash -lc 'cd ~/unionfs_demo && /mnt/d/Mini-UnionFS-Team/mini_unionfs lower upper mnt -f -o auto_unmount'
+wsl -d Ubuntu -e bash -lc "cd ~/unionfs_demo && /mnt/d/Mini-UnionFS-Team/mini_unionfs lower upper mnt -f -o auto_unmount"
 ```
 
 ### 4) Verify Mount (Terminal B)
@@ -88,50 +89,50 @@ Run in **Terminal B**:
 ```powershell
 wsl -d Ubuntu findmnt ~/unionfs_demo/mnt
 wsl -d Ubuntu ls -la ~/unionfs_demo/mnt
-```
-
-### 5) Show Upper Layer Starts Empty
-Run in **Terminal B**:
-```powershell
 wsl -d Ubuntu ls -la ~/unionfs_demo/upper
 ```
 
-### 6) Trigger Copy-on-Write
-Modify file via mountpoint:
+### 5) Trigger Copy-on-Write
+Modify lower-origin file through mountpoint:
 ```powershell
-wsl -d Ubuntu bash -lc 'echo "demo-write-1" >> ~/unionfs_demo/mnt/base.txt'
+wsl -d Ubuntu bash -lc "echo FIXED_COW_TEST > ~/unionfs_demo/mnt/base.txt"
 ```
-Now show promoted file in upper layer:
+Now verify lower stays original and upper has modified copy:
 ```powershell
 wsl -d Ubuntu ls -la ~/unionfs_demo/upper
-wsl -d Ubuntu bash -lc 'echo "LOWER tail:"; tail -n 1 ~/unionfs_demo/lower/base.txt; echo "UPPER tail:"; tail -n 2 ~/unionfs_demo/upper/base.txt'
+wsl -d Ubuntu bash -lc "echo LOWER:; tail -n 1 ~/unionfs_demo/lower/base.txt; echo UPPER:; tail -n 1 ~/unionfs_demo/upper/base.txt"
 ```
 
-### 7) Show New File Creation Goes to Upper
+### 6) Show New File Creation Goes to Upper
 ```powershell
-wsl -d Ubuntu bash -lc 'echo "created via mount" > ~/unionfs_demo/mnt/new.txt && ls -la ~/unionfs_demo/upper'
+wsl -d Ubuntu bash -lc "echo NEW_FILE_TEST > ~/unionfs_demo/mnt/testfile.txt"
+wsl -d Ubuntu ls -la ~/unionfs_demo/upper
 ```
 
-### 8) Show Whiteout on Delete
+### 7) Show Whiteout on Delete
 Delete a lower-origin file through mountpoint:
 ```powershell
-wsl -d Ubuntu bash -lc 'rm ~/unionfs_demo/mnt/base.txt && ls -la ~/unionfs_demo/upper && echo "Merged view:" && ls -la ~/unionfs_demo/mnt'
+wsl -d Ubuntu bash -lc "rm ~/unionfs_demo/mnt/base.txt"
+wsl -d Ubuntu ls -la ~/unionfs_demo/upper
+wsl -d Ubuntu ls -la ~/unionfs_demo/mnt
+wsl -d Ubuntu ls -la ~/unionfs_demo/lower
 ```
 Expected in upper layer: `.wh.base.txt`.
 
-### 9) Optional Nautilus UI Steps (visual demo)
-Open mount and upper folders visually:
+### 8) Optional Nautilus UI Steps (visual demo)
+Open mount, upper, and lower folders visually:
 ```powershell
 wsl -d Ubuntu nautilus ~/unionfs_demo/mnt &
 wsl -d Ubuntu nautilus ~/unionfs_demo/upper &
+wsl -d Ubuntu nautilus ~/unionfs_demo/lower &
 ```
 If Nautilus interaction is flaky on WSLg, keep using Terminal B for edits and use Nautilus only as a viewer.
 
-### 10) Stop and Clean Up
+### 9) Stop and Clean Up
 In **Terminal A**, press `Ctrl+C` to unmount.
 Then run in **Terminal B**:
 ```powershell
-wsl -d Ubuntu bash -lc 'findmnt ~/unionfs_demo/mnt || echo "Unmounted successfully"'
+wsl -d Ubuntu bash -lc "findmnt ~/unionfs_demo/mnt || echo Unmounted successfully"
 ```
 Optional cleanup:
 ```powershell
